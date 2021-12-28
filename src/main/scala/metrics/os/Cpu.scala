@@ -1,4 +1,4 @@
-package metrics
+package metrics.os
 
 import jdk.jfr.consumer.RecordedEvent
 import kamon.Kamon
@@ -6,8 +6,7 @@ import kamon.metric.{InstrumentGroup, MeasurementUnit}
 import kamon.tag.TagSet
 
 object Cpu {
-  val CpuUsage = Kamon.gauge(
-    name = "os.cpu.usage",
+  val CpuUsage = Kamon.gauge(name = "os.cpu.usage",
     description = "Samples the CPU usage percentage using JFR Events",
     unit = MeasurementUnit.percentage)
 
@@ -16,7 +15,7 @@ object Cpu {
     val system = register(CpuUsage, "mode", "system")
     val combined = register(CpuUsage, "mode", "combined")
 
-  val cpuInstruments = CpuInstruments(TagSet.of("component", "host"))
+  val cpuInstruments = CpuInstruments(TagSet.of("component", "os"))
 
   def onCPULoad(event: RecordedEvent): Unit =
     cpuInstruments.user.update(event.getDouble("jvmUser"))
