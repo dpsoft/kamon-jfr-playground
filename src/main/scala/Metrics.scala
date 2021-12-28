@@ -1,16 +1,14 @@
 import scala.collection.concurrent.TrieMap
 import java.time.Instant
 import jdk.jfr.consumer.{EventStream, RecordedEvent, RecordingStream}
+
 import java.time.Duration
 import kamon.Kamon
 import kamon.tag.TagSet
-import kamon.metric.InstrumentGroup
-import kamon.metric.MeasurementUnit
+import kamon.metric.{Gauge, Histogram, InstrumentGroup, MeasurementUnit}
 
-enum JfrMetrics(name:String) {
-    case SafePoint extends JfrMetrics("")
-    case CPU extends JfrMetrics("")
-}
+import scala.collection.mutable
+
 
 object SafePointHandler {
     private val safepointBegin = TrieMap.empty[Long, Instant]
@@ -51,14 +49,85 @@ object CpuHandler {
         cpuInstruments.combined.update(event.getDouble("machineTotal"))   
 }
 
+object MemoryHandler {
+    val MemoryUsed = Kamon.gauge(
+        name = "os.memory.used",
+        description = "Tracks the amount of used memory",
+        unit = MeasurementUnit.information.bytes)
+
+    val MemoryFree = Kamon.gauge(
+        name = "os.memory.free",
+        description = "Tracks the amount of free memory",
+        unit = MeasurementUnit.information.bytes)
+
+    val MemoryTotal = Kamon.gauge(
+        name = "os.memory.total",
+        description = "Tracks the total memory available",
+        unit = MeasurementUnit.information.bytes)    
+
+    class MemoryInstruments(tags: TagSet) extends InstrumentGroup(tags) {
+        val used = register(MemoryUsed)
+        val total = register(MemoryTotal)
+        val free = register(MemoryFree)
+    }
+
+    val memoryInstruments = MemoryInstruments(TagSet.of("component", "host"))
+
+    def onPhysicalMemory(event: RecordedEvent): Unit =
+        val used = event.getDouble("usedSize")
+        val total = event.getDouble("totalSize")
+        val free = total - used //???
+
+        memoryInstruments.used.update(used)
+        memoryInstruments.total.update(total)
+        memoryInstruments.free.update(free)
+}
+
 object GCHandler {
-    def onGCRun(event:RecordedEvent) = {
-        System.out.println(event)
+    val GC = Kamon.histogram(
+        name = "jvm.gc",
+        description = "Tracks the distribution of GC events duration",
+        unit = MeasurementUnit.time.milliseconds
+    )
+
+    val GcPauses = Kamon.histogram(
+        name = "jvm.gc.pauses",
+        description = "Sum of all the times in which Java execution was paused during the garbage collection",
+        unit = MeasurementUnit.time.milliseconds
+    )
+
+    val GcLongestPause = Kamon.gauge(
+        name = "jvm.gc.longest-pause",
+        description = "Longest individual pause during the garbage collection"
+    )
+
+    class GarbageCollectionInstruments(tags: TagSet) extends InstrumentGroup(tags) {
+        private val collectorCache = TrieMap.empty[String, (Histogram, Histogram, Gauge)]
+
+        def instruments(collectorName: String): (Histogram, Histogram, Gauge) =
+            collectorCache.getOrElseUpdate(collectorName, {
+                val collectorTags = TagSet.builder()
+                  .add("collector", collectorName)
+                  .build()
+
+                (register(GC, collectorTags), register(GcPauses, collectorTags),  register(GcLongestPause, collectorTags))
+            })
+    }
+
+    val gcInstruments: GarbageCollectionInstruments = GarbageCollectionInstruments(TagSet.of("component", "jvm"))
+
+    def onGarbageCollection(event:RecordedEvent): Unit = {
+        val (gcTime, pauses, longest) = gcInstruments.instruments(event.getString("name"))
+
+        gcTime.record(event.getLong("duration"))
+        pauses.record(event.getLong("sumOfPauses"))
+        longest.update(event.getLong("longestPause"))
     }
 }
 
 object JavaMonitorHandler {
     def onMonitorEnter(event:RecordedEvent) = {
+
         // Kamon.gauge("jdk.java-mohitor-enter.monitor-class").withoutTags().update(event.getFloat("monitorClass"))
         System.out.println(event)
     }
