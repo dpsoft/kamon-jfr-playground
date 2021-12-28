@@ -16,7 +16,7 @@ object Threads {
     val peak = register(ThreadsPeak)
     val daemon = register(ThreadsDaemon)
 
-  private val threadsInstruments = ThreadsInstruments(TagSet.Empty)
+  private val threadsInstruments = ThreadsInstruments(TagSet.of("component", "jvm"))
 
   def onJavaThreadStatistics(event: RecordedEvent): Unit =
     threadsInstruments.total.update(event.getLong("activeCount"))

@@ -4,7 +4,7 @@ import jdk.jfr.consumer.{EventStream, MetadataEvent, RecordedEvent, RecordingStr
 import kamon.Kamon
 import kamon.metric.PeriodSnapshot
 import kamon.module.MetricReporter
-import metrics.jvm.{GarbageCollection, Safepoint, Threads}
+import metrics.jvm.{ClassLoading, GarbageCollection, Safepoint, Threads}
 import metrics.os.{Cpu, Memory, Network}
 
 import java.time.Duration
@@ -60,6 +60,7 @@ object KamonJfr {
         case "jdk.SafepointBegin" => Safepoint.onSafepointBegin(event)
         case "jdk.SafepointEnd" => Safepoint.onSafepointEnd(event)
         case "jdk.NetworkUtilization" => Network.onNetworkUtilization(event)
+        case "jdk.ClassLoadingStatistics" => ClassLoading.onClassLoadingStatistics(event)
 
         // case "jdk.JavaMonitorEnter" => JavaMonitorHandler.onMonitorEnter(event)
         // case "jdk.ExecutionSample" => println("====>>>> ExecutionSample"+ event)
