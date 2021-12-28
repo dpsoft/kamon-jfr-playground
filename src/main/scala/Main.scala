@@ -27,44 +27,27 @@ object KamonJfr {
 }
 
 @main def hello: Unit = {
+//  val c = Configuration.getConfiguration("default")
+//  println(c.getSettings())
 
- val safepointBegin = TrieMap.empty[Long, Instant]
+Kamon.init()
 
-//  Kamon.init()
+ Kamon.registerModule("Metrics", new MetricReporter {
+   override def reportPeriodSnapshot(snapshot: PeriodSnapshot): Unit = {
+     println(snapshot)
+   }
 
-//  Kamon.registerModule("Metrics", new MetricReporter {
-//    override def reportPeriodSnapshot(snapshot: PeriodSnapshot): Unit = {
-//      println(snapshot)
-//    }
+   override def stop(): Unit = {}
 
-//    override def stop(): Unit = {}
-
-//    override def reconfigure(newConfig: Config): Unit = {}
-//  })
+   override def reconfigure(newConfig: Config): Unit = {}
+ })
  
-//  System.gc()
-
-//  val configuration = Configuration.getConfiguration("default")
-//  println(configuration.getSettings())
- var configuration = KamonJfr.jfrConfig
+ val configuration = KamonJfr.jfrConfig
 
  Using.resource(RecordingStream()) { es =>  
    es.setSettings(configuration.asJava)
-   es.onMetadata(metadata => onMetadata(metadata))
+  //  es.onMetadata(metadata => onMetadata(metadata))
    es.onEvent(e => onEvent(e))
-   // regixster event handlersxxxxxx
-  //  es.onEvent("jdk.CPULoad", onCPULoad)
-  //  es.onEvent("jdk.JavaThreadStatistics", onJavaThreadStatistics)
-  //  es.onEvent("jdk.SafepointBegin", onSafepointBegin)
-  //  es.onEvent("jdk.SafepointEnd", onSafepointEnd)
-
-  //  es.onEvent("jdk.JavaMonitorEnter", event => Kamon.gauge("jdk.java-mohitor-enter.monitor-class").withoutTags().update(event.getFloat("monitorClass")))
-
-   // register event handlers
-  //  es.onEvent("jdk.GarbageCollection", System.out.println)
-  //  es.onEvent("jdk.CPULoad", System.out.println)
-   es.onEvent("jdk.JVMInformation", System.out.println)
-
    // start and block
    es.start
  }
@@ -76,13 +59,14 @@ object KamonJfr {
   def onEvent(event: RecordedEvent):Unit = {
     event.getEventType.getName match {
       case "jdk.CPULoad" => CpuHandler.onCPULoad(event)
-      case "jdk.JavaMonitorEnter" => JavaMonitorHandler.onMonitorEnter(event)
-      case "jdk.GarbageCollection" => GCHandler.onGCRun(event)
-      case "jdk.JavaThreadStatistics" => Threads.onJavaThreadStatistics(event)
-      case "jdk.SafepointBegin" => SafePointHandler.onSafepointBegin(event)
-      case "jdk.SafepointEnd" => SafePointHandler.onSafepointEnd(event)
-      case "jdk.ExecutionSample" => println("====>>>> ExecutionSample"+ event)
-      case "jdk.NetworkUtilization" => println("====>>>> jdk.NetworkUtilization"+ event)
+      // case "jdk.JavaMonitorEnter" => JavaMonitorHandler.onMonitorEnter(event)
+      // case "jdk.GarbageCollection" => GCHandler.onGCRun(event)
+      // case "jdk.JavaThreadStatistics" => Threads.onJavaThreadStatistics(event)
+      // case "jdk.SafepointBegin" => SafePointHandler.onSafepointBegin(event)
+      // case "jdk.SafepointEnd" => SafePointHandler.onSafepointEnd(event)
+      // case "jdk.ExecutionSample" => println("====>>>> ExecutionSample"+ event)
+      // case "jdk.ObjectAllocationSample" => println("====>>>> allocationSample"+ event)
+      // case "jdk.NetworkUtilization" => println("====>>>> jdk.NetworkUtilization"+ event)
       case other => println(event)
     }
   }
@@ -90,7 +74,10 @@ object KamonJfr {
 
 
 
+// val safepointBegin = TrieMap.empty[Long, Instant]
 
+//  
+//  System.gc()
 
 
 

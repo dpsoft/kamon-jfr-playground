@@ -3,6 +3,9 @@ import java.time.Instant
 import jdk.jfr.consumer.{EventStream, RecordedEvent, RecordingStream}
 import java.time.Duration
 import kamon.Kamon
+import kamon.tag.TagSet
+import kamon.metric.InstrumentGroup
+import kamon.metric.MeasurementUnit
 
 enum JfrMetrics(name:String) {
     case SafePoint extends JfrMetrics("")
@@ -30,11 +33,22 @@ object SafePointHandler {
 }
 
 object CpuHandler {
+    val CpuUsage = Kamon.gauge(
+        name = "os.cpu.usage",  
+        description = "Samples the CPU usage percentage using JFR Events", 
+        unit = MeasurementUnit.percentage)
     
-    def onCPULoad(event:RecordedEvent) = {
-        System.out.println(event)
-        Kamon.gauge("cpu-load.machine-total").withoutTags().update(event.getDouble("machineTotal"))
-    }
+    class CpuInstruments(tags: TagSet) extends InstrumentGroup(tags):
+        val user = register(CpuUsage, "mode", "user")
+        val system = register(CpuUsage, "mode", "system")
+        val combined = register(CpuUsage, "mode", "combined")
+    
+    val cpuInstruments = CpuInstruments(TagSet.of("component", "host"))
+
+    def onCPULoad(event: RecordedEvent): Unit =
+        cpuInstruments.user.update(event.getDouble("jvmUser"))
+        cpuInstruments.system.update(event.getDouble("jvmSystem"))
+        cpuInstruments.combined.update(event.getDouble("machineTotal"))   
 }
 
 object GCHandler {
