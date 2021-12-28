@@ -7,11 +7,13 @@ import kamon.module.MetricReporter
 import metrics.jvm.{ClassLoading, GarbageCollection, ObjectAllocation, Safepoint, Threads}
 import metrics.os.{Cpu, Memory, Network}
 
+import java.util.Map as JMap
 import java.time.Duration
 import java.util.function.Consumer
 import scala.collection.concurrent.TrieMap
 import scala.util.Using
 import java.time.Instant
+import java.util.concurrent.atomic.AtomicBoolean
 import scala.jdk.CollectionConverters.*
 
 object KamonJfr {
@@ -26,49 +28,42 @@ object KamonJfr {
       .toMap
 
   @main def main(): Unit = {
-
     Kamon.init()
+    val configuration = KamonJfr.jfrConfig.asJava
 
-    Kamon.registerModule("jfr-metrics", new MetricReporter {
-      override def reportPeriodSnapshot(snapshot: PeriodSnapshot): Unit = { println(snapshot) }
-      override def stop(): Unit = {}
-      override def reconfigure(newConfig: Config): Unit = {}
-    })
+    startJfrConsumer(configuration)
+  }
 
-    val configuration = KamonJfr.jfrConfig
-
-    Thread(() => {
-      Using.resource(RecordingStream()) { rs =>
-        rs.setSettings(configuration.asJava)
-        rs.onMetadata(metadata => onMetadata(metadata))
-        rs.onEvent(e => onEvent(e))
-
-        rs.start()
-      }
-    }).start()
+  def onEvent(event: RecordedEvent): Unit = {
+    event.getEventType.getName match {
+      case "jdk.CPULoad" => Cpu.onCPULoad(event)
+      case "jdk.PhysicalMemory" => Memory.onPhysicalMemory(event)
+      case "jdk.GarbageCollection" => GarbageCollection.onGarbageCollection(event)
+      case "jdk.JavaThreadStatistics" => Threads.onJavaThreadStatistics(event)
+      case "jdk.SafepointBegin" => Safepoint.onSafepointBegin(event)
+      case "jdk.SafepointEnd" => Safepoint.onSafepointEnd(event)
+      case "jdk.NetworkUtilization" => Network.onNetworkUtilization(event)
+      case "jdk.ClassLoadingStatistics" => ClassLoading.onClassLoadingStatistics(event)
+      case "jdk.ObjectAllocationSample" => ObjectAllocation.onAllocationSample(event)
+      case other => println(event)
+    }
+  }
 
     def onMetadata(metadata: MetadataEvent): Unit = {
       metadata.getEventTypes.asScala.filterNot(_.isEnabled).foreach(x => println(x.getName))
     }
 
-    def onEvent(event: RecordedEvent): Unit = {
-      event.getEventType.getName match {
-        case "jdk.CPULoad" => Cpu.onCPULoad(event)
-        case "jdk.PhysicalMemory" => Memory.onPhysicalMemory(event)
-        case "jdk.GarbageCollection" => GarbageCollection.onGarbageCollection(event)
-        case "jdk.JavaThreadStatistics" => Threads.onJavaThreadStatistics(event)
-        case "jdk.SafepointBegin" => Safepoint.onSafepointBegin(event)
-        case "jdk.SafepointEnd" => Safepoint.onSafepointEnd(event)
-        case "jdk.NetworkUtilization" => Network.onNetworkUtilization(event)
-        case "jdk.ClassLoadingStatistics" => ClassLoading.onClassLoadingStatistics(event)
-        case "jdk.ObjectAllocationSample" => ObjectAllocation.onAllocationSample(event)
-        case other => println(event)
-      }
-    }
+    def startJfrConsumer(settings: JMap[String, String]): Unit =
+      val consumer = Thread(() => {
+        Using.resource(RecordingStream()) { rs =>
+          rs.setSettings(settings)
+//          rs.onMetadata(metadata => onMetadata(metadata))
+          rs.onEvent(e => onEvent(e))
+          rs.start()
+        }
+      })
 
-    System.gc()
-    System.gc()
-
-    Thread.sleep(10000000)
+      consumer.setName("jfr-consumer")
+      consumer.setDaemon(true)
+      consumer.start()
   }
-}

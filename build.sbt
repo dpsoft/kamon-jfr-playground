@@ -9,6 +9,7 @@ lazy val root = project
     scalaVersion := scala3Version,
 
     libraryDependencies += "io.kamon" %% "kamon-core" % "2.4.2",
+    libraryDependencies += "io.kamon" %% "kamon-prometheus" % "2.4.2",
     libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % "test",
     libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.2.3",
     libraryDependencies += "org.typelevel" %% "cats-effect" % "3.1.1",
