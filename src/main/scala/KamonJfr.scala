@@ -4,7 +4,7 @@ import jdk.jfr.consumer.{EventStream, MetadataEvent, RecordedEvent, RecordingStr
 import kamon.Kamon
 import kamon.metric.PeriodSnapshot
 import kamon.module.MetricReporter
-import metrics.jvm.{ClassLoading, GarbageCollection, Safepoint, Threads}
+import metrics.jvm.{ClassLoading, GarbageCollection, ObjectAllocation, Safepoint, Threads}
 import metrics.os.{Cpu, Memory, Network}
 
 import java.time.Duration
@@ -61,10 +61,7 @@ object KamonJfr {
         case "jdk.SafepointEnd" => Safepoint.onSafepointEnd(event)
         case "jdk.NetworkUtilization" => Network.onNetworkUtilization(event)
         case "jdk.ClassLoadingStatistics" => ClassLoading.onClassLoadingStatistics(event)
-
-        // case "jdk.JavaMonitorEnter" => JavaMonitorHandler.onMonitorEnter(event)
-        // case "jdk.ExecutionSample" => println("====>>>> ExecutionSample"+ event)
-        // case "jdk.ObjectAllocationSample" => println("====>>>> allocationSample"+ event)
+        case "jdk.ObjectAllocationSample" => ObjectAllocation.onAllocationSample(event)
         case other => println(event)
       }
     }
@@ -75,4 +72,3 @@ object KamonJfr {
     Thread.sleep(10000000)
   }
 }
-////https://github.com/DataDog/dd-trace-java/blob/master/dd-java-agent/agent-profiling/profiling-controller-openjdk/src/main/java/com/datadog/profiling/controller/openjdk/OpenJdkController.java
