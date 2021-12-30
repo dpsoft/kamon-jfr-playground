@@ -1,4 +1,4 @@
-package profiler.parser
+package io.kamon.jfr.profiler.parser
 
 import java.beans.MethodDescriptor
 import scala.util.parsing.combinator.RegexParsers

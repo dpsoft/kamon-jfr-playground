@@ -1,10 +1,10 @@
-package metrics.jvm
+package io.kamon.jfr.metrics.jvm
 
 import jdk.jfr.consumer.RecordedEvent
 import kamon.Kamon
 import kamon.metric.{Gauge, Histogram, InstrumentGroup, MeasurementUnit}
 import kamon.tag.TagSet
-import metrics.jvm.GarbageCollection.GarbageCollectionInstruments.GCInstruments
+import GarbageCollection.GarbageCollectionInstruments.GCInstruments
 
 import scala.collection.concurrent.TrieMap
 

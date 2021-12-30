@@ -1,7 +1,7 @@
-package profiler
+package io.kamon.jfr.profiler
 
+import io.kamon.jfr.profiler.parser.MethodSignatureParser
 import jdk.jfr.consumer.RecordedEvent
-import profiler.parser.MethodSignatureParser
 
 import java.lang.reflect.Modifier
 import scala.jdk.CollectionConverters.*

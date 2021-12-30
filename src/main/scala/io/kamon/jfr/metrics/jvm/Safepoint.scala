@@ -1,4 +1,4 @@
-package metrics.jvm
+package io.kamon.jfr.metrics.jvm
 
 import jdk.jfr.consumer.RecordedEvent
 import kamon.Kamon
