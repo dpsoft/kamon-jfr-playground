@@ -4,8 +4,9 @@ import jdk.jfr.consumer.{EventStream, MetadataEvent, RecordedEvent, RecordingStr
 import kamon.Kamon
 import kamon.metric.PeriodSnapshot
 import kamon.module.MetricReporter
-import metrics.jvm.{ClassLoading, GarbageCollection, ObjectAllocation, Safepoint, Threads}
+import metrics.jvm.{ClassLoading, GarbageCollection, Safepoint, Threads}
 import metrics.os.{Cpu, Memory, Network}
+import profiler.ObjectAllocation
 
 import java.util.Map as JMap
 import java.time.Duration
