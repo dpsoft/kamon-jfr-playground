@@ -2,6 +2,8 @@ package profiler
 
 import jdk.jfr.consumer.RecordedEvent
 import profiler.parser.MethodSignatureParser
+
+import java.lang.reflect.Modifier
 import scala.jdk.CollectionConverters.*
 
 object ObjectAllocation {
@@ -18,9 +20,10 @@ object ObjectAllocation {
         .filterNot(f => !f.isJavaFrame || f.getMethod.isHidden)
         .foreach { rf =>
           val method = rf.getMethod
+          val modifier = Modifier.toString(method.getModifiers)
           val methodDescriptor = s"${method.getType.getName}.${method.getName}${method.getDescriptor}"
           val methodSignature = MethodSignatureParser.methodParameters(methodDescriptor)
-          val ppMethod = s"${methodSignature}:${rf.getLineNumber}"
+          val ppMethod = s"${modifier} ${methodSignature}:${rf.getLineNumber}"
 
           println("\t" + ppMethod)
         }
