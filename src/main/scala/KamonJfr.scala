@@ -4,6 +4,7 @@ import jdk.jfr.consumer.{EventStream, MetadataEvent, RecordedEvent, RecordingStr
 import kamon.Kamon
 import kamon.metric.PeriodSnapshot
 import kamon.module.MetricReporter
+import metrics.container.{ContainerCpu, ContainerMemory}
 import metrics.jvm.{ClassLoading, GarbageCollection, Safepoint, Threads}
 import metrics.os.{Cpu, Memory, Network}
 import profiler.ObjectAllocation
@@ -45,6 +46,8 @@ object KamonJfr {
       case "jdk.SafepointEnd" => Safepoint.onSafepointEnd(event)
       case "jdk.NetworkUtilization" => Network.onNetworkUtilization(event)
       case "jdk.ClassLoadingStatistics" => ClassLoading.onClassLoadingStatistics(event)
+      case "jdk.ContainerMemoryUsage" => ContainerMemory.onContainerMemory(event)
+      case "jdk.ContainerCPUUsage" => ContainerCpu.onContainerCPULoad(event)
       case "jdk.ObjectAllocationSample" => ObjectAllocation.onAllocationSample(event)
       case other => println(event)
     }
