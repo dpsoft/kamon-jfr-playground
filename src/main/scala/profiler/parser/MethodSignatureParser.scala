@@ -15,7 +15,7 @@ class MethodSignatureParser extends RegexParsers {
     case c ~ Some(s) => c + s
   }
   def regularName: Parser[String] = """[A-Z0-9a-z_.$]+""".r
-  def specialName: Parser[String] = "&lt;" ~> initializer <~ "&gt;" ^^ ("<" + _ + ">")
+  def specialName: Parser[String] = "<" ~> initializer <~ ">" ^^ ("<" + _ + ">")
   def initializer: Parser[String] = "init" | "clinit"
   def result: Parser[String] = void | nonVoid
   def parameters: Parser[String] = rep(nonVoid) ^^ {
@@ -46,7 +46,14 @@ class MethodSignatureParser extends RegexParsers {
 }
 
 object MethodSignatureParser extends MethodSignatureParser {
-  def methodSignature(methodDescriptor: String): String =
-    //TODO
-    parse(signature, methodDescriptor).get
+  def methodSignature(methodDescriptor: String): Option[String] =
+    parse(signature, methodDescriptor) match {
+      case Success(matched, _) => Some(matched)
+      case Failure(msg, input) =>
+        println(s"FAILURE: $msg Input: $input")
+        None
+      case Error(msg, _) =>
+        println(s"ERROR: $msg")
+        None
+    }
 }
