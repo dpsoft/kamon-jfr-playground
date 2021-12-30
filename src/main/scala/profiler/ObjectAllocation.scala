@@ -22,7 +22,7 @@ object ObjectAllocation {
           val method = rf.getMethod
           val modifier = Modifier.toString(method.getModifiers)
           val methodDescriptor = s"${method.getType.getName}.${method.getName}${method.getDescriptor}"
-          val methodSignature = MethodSignatureParser.methodParameters(methodDescriptor)
+          val methodSignature = MethodSignatureParser.methodSignature(methodDescriptor)
           val ppMethod = s"${modifier} ${methodSignature}:${rf.getLineNumber}"
 
           println("\t" + ppMethod)

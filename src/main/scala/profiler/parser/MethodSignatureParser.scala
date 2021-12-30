@@ -46,7 +46,7 @@ class MethodSignatureParser extends RegexParsers {
 }
 
 object MethodSignatureParser extends MethodSignatureParser {
-  def methodParameters(methodDescriptor: String): String =
+  def methodSignature(methodDescriptor: String): String =
     //TODO
     parse(signature, methodDescriptor).get
 }
