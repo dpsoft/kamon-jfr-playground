@@ -1,10 +1,10 @@
-package metrics.os
+package io.kamon.jfr.metrics.os
 
 import jdk.jfr.consumer.RecordedEvent
 import kamon.Kamon
 import kamon.metric.{Counter, InstrumentGroup, MeasurementUnit}
 import kamon.tag.TagSet
-import metrics.os.Network.NetworkInstruments.InterfaceInstruments
+import Network.NetworkInstruments.InterfaceInstruments
 
 import scala.collection.concurrent.TrieMap
 
