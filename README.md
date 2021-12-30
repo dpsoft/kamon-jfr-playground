@@ -6,3 +6,11 @@ This is a normal sbt project. You can compile code with `sbt compile`, run it wi
 
 For more information on the sbt-dotty plugin, see the
 [dotty-example-project](https://github.com/lampepfl/dotty-example-project/blob/master/README.md).
+
+### Docker services
+
+To start `Prometheus`, `Grafana` and `Pinot` run the following command from the project root:
+
+```bash
+docker-compose -f docker/docker-compose.yml up -d
+```

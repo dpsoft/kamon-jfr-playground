@@ -60,6 +60,8 @@ services:
         max-size: "10m"
         max-file: "10"
   prometheus:
+    extra_hosts:
+      - host.docker.internal:host-gateway
     container_name: prometheus
     image: prom/prometheus:v2.32.1
     ports:
