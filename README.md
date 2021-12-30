@@ -9,7 +9,7 @@ For more information on the sbt-dotty plugin, see the
 
 ### Docker services
 
-To start `Prometheus`, `Grafana` and `Pinot` run the following command from the project root:
+To start `Prometheus`, `Grafana`, `Kafka` and `Pinot` run the following command from the project root:
 
 ```bash
 docker-compose -f docker/docker-compose.yml up -d
