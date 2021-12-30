@@ -15,7 +15,7 @@ object GarbageCollection {
     unit = MeasurementUnit.time.milliseconds
   )
 
-  private val GcPauses = Kamon.histogram(
+  private val GcPauses = Kamon.gauge(
     name = "jvm.gc.pauses",
     description = "Sum of all the times in which Java execution was paused during the garbage collection",
     unit = MeasurementUnit.time.milliseconds
@@ -44,7 +44,7 @@ object GarbageCollection {
   }
 
   object GarbageCollectionInstruments:
-    case class GCInstruments(gcTime: Histogram, gcPauses: Histogram, gcLongestPause: Gauge)
+    case class GCInstruments(gcTime: Histogram, gcPauses: Gauge, gcLongestPause: Gauge)
 
   private val gcInstruments = GarbageCollectionInstruments(TagSet.of("component", "jvm"))
 
@@ -52,7 +52,7 @@ object GarbageCollection {
     val instruments = gcInstruments.instruments(event.getString("name"))
 
     instruments.gcTime.record(event.getLong("duration"))
-    instruments.gcPauses.record(event.getLong("sumOfPauses"))
+    instruments.gcPauses.update(event.getLong("sumOfPauses"))
     instruments.gcLongestPause.update(event.getLong("longestPause"))
   }
 }
