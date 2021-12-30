@@ -1,45 +1,58 @@
 version: '3.7'
 services:
-#  zookeeper:
-#    image: zookeeper:3.5.6
-#    hostname: zookeeper
-#    container_name: manual-zookeeper
-#    ports:
-#      - "2181:2181"
-#    environment:
-#      ZOOKEEPER_CLIENT_PORT: 2181
-#      ZOOKEEPER_TICK_TIME: 2000
-#  pinot-controller:
-#    image: apachepinot/pinot:0.9.2
-#    command: "StartController -zkAddress manual-zookeeper:2181"
-#    container_name: "manual-pinot-controller"
-#    restart: unless-stopped
-#    ports:
-#      - "9000:9000"
-#    environment:
-#      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms1G -Xmx4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-controller.log"
-#    depends_on:
-#      - zookeeper
-#  pinot-broker:
-#    image: apachepinot/pinot:0.9.2
-#    command: "StartBroker -zkAddress manual-zookeeper:2181"
-#    restart: unless-stopped
-#    container_name: "manual-pinot-broker"
-#    ports:
-#      - "8099:8099"
-#    environment:
-#      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms4G -Xmx4G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-broker.log"
-#    depends_on:
-#      - pinot-controller
-#  pinot-server:
-#    image: apachepinot/pinot:0.9.2
-#    command: "StartServer -zkAddress manual-zookeeper:2181"
-#    restart: unless-stopped
-#    container_name: "manual-pinot-server"
-#    environment:
-#      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms4G -Xmx16G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-server.log"
-#    depends_on:
-#      - pinot-broker
+  zookeeper:
+    image: zookeeper:3.5.6
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+  pinot-controller:
+    image: apachepinot/pinot:0.9.2
+    command: "StartController -zkAddress zookeeper:2181"
+    container_name: pinot-controller
+    restart: unless-stopped
+    ports:
+      - "9000:9000"
+    environment:
+      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms1G -Xmx1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-controller.log"
+    depends_on:
+      - zookeeper
+  pinot-broker:
+    image: apachepinot/pinot:0.9.2
+    command: "StartBroker -zkAddress zookeeper:2181"
+    restart: unless-stopped
+    container_name: pinot-broker
+    ports:
+      - "8099:8099"
+    environment:
+      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms1G -Xmx1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-broker.log"
+    depends_on:
+      - pinot-controller
+  pinot-server:
+    image: apachepinot/pinot:0.9.2
+    command: "StartServer -zkAddress zookeeper:2181"
+    restart: unless-stopped
+    container_name: pinot-server
+    environment:
+      JAVA_OPTS: "-Dplugins.dir=/opt/pinot/plugins -Xms1G -Xmx1G -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -Xloggc:gc-pinot-server.log"
+    depends_on:
+      - pinot-broker
+  kafka:
+    image: 'bitnami/kafka:2.8.1'
+    container_name: kafka
+    ports:
+      - '9092:9092'
+    environment:
+      - KAFKA_BROKER_ID=1
+      - KAFKA_CFG_LISTENERS=PLAINTEXT://:9092
+      - KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181/kafka
+      - ALLOW_PLAINTEXT_LISTENER=yes
+    depends_on:
+      - zookeeper
   grafana:
     image: grafana/grafana:8.3.3
     container_name: grafana
@@ -82,6 +95,3 @@ services:
 volumes:
   prometheus_data: {}
   grafana_data: {}
-  
-  
-  
