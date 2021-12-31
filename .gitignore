@@ -34,4 +34,5 @@ hs_err_pid*
 
 .bsp/
 .idea/
+docker/pinot-kafka-docker/
 # End of https://www.toptal.com/developers/gitignore/api/scala,bloop,sbt,metals
