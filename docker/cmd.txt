@@ -1,0 +1,14 @@
+
+kafka-topics  --bootstrap-server localhost:9092 --list
+kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic jfr-events
+kafka-console-consumer --bootstrap-server localhost:9092 --topic transcript-topic --from-beginning
+
+docker exec -t kamon-jrf-playground_kafka_1  kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic topic-test
+docker exec -t kamon-jrf-playground_kafka_1  kafka-topics --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1 --topic transcript-topic
+docker exec -t kamon-jrf-playground_kafka_1  kafka-topics  --bootstrap-server localhost:9092 --list
+
+docker exec -t kamon-jrf-playground_kafka_1  kafka-console-producer --broker-list localhost:9092 --topic transcript-topic {"studentID":205,"firstName":"Diego","lastName":"Parra","gender":"Male","subject":"Maths","score":1.8,"timestamp":1571900400000}
+
+
+
+echo {"studentID":205,"firstName":"Natalie","lastName":"Jones","gender":"Female","subject":"Maths","score":3.8,"timestamp":1571900400000} | kafka-console-producer --broker-list localhost:9092 --topic transcript-topic

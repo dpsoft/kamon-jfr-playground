@@ -3,7 +3,7 @@ package io.kamon.jfr.consumer
 import io.kamon.jfr.metrics.container.{ContainerCpu, ContainerMemory}
 import io.kamon.jfr.metrics.jvm.{ClassLoading, GarbageCollection, Safepoint, Threads}
 import io.kamon.jfr.metrics.os.{Cpu, Memory, Network}
-import io.kamon.jfr.profiler.ObjectAllocation
+import io.kamon.jfr.profiler.Profiler
 import jdk.jfr.consumer.{MetadataEvent, RecordedEvent, RecordingStream}
 import scala.jdk.CollectionConverters.*
 
@@ -38,7 +38,7 @@ final class JfrConsumer(settings: JMap[String, String]) extends Thread {
       case "jdk.ClassLoadingStatistics" => ClassLoading.onClassLoadingStatistics(event)
       case "jdk.ContainerMemoryUsage" => ContainerMemory.onContainerMemory(event)
       case "jdk.ContainerCPUUsage" => ContainerCpu.onContainerCPULoad(event)
-      case "jdk.ObjectAllocationSample" => ObjectAllocation.onAllocationSample(event)
+      case "jdk.ObjectAllocationSample" => Profiler.onAllocationSample(event)
       case other => println(event)
     }
 

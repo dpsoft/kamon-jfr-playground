@@ -5,7 +5,7 @@ import io.kamon.jfr.consumer.JfrConsumer
 import io.kamon.jfr.metrics.container.{ContainerCpu, ContainerMemory}
 import io.kamon.jfr.metrics.jvm.{ClassLoading, GarbageCollection, Safepoint, Threads}
 import io.kamon.jfr.metrics.os.{Cpu, Memory, Network}
-import io.kamon.jfr.profiler.ObjectAllocation
+import io.kamon.jfr.profiler.Profiler
 import jdk.jfr.Configuration
 import jdk.jfr.consumer.{EventStream, MetadataEvent, RecordedEvent, RecordingStream}
 import kamon.Kamon
