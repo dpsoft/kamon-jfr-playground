@@ -60,7 +60,7 @@ Then open the [Pinot] SQL Console(localhost:9000/#/query) and Enjoy!
 
 ![](img/pinot-profilling-2.png)
 ## Disclaimer
-I have just scratched the surface of Pinot capabilities and am sure there are other better ways of modeling than the one proposed, 
+I have just scratched the surface of Pinot capabilities and i'm sure there are other better ways of modeling than the one proposed, 
 using other features and data types.
 
 # License
