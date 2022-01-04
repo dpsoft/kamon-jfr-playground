@@ -53,7 +53,7 @@ curl -X POST "http://localhost:9000/tables" -H "accept: application/json" -H "Co
 # Enable `jdk.ObjectAllocationSample` event in application.conf changing
 "jdk.ObjectAllocationSample#enabled=false" to "jdk.ObjectAllocationSample#enabled=true" 
 ```
-Then open the [Pinot] dashboard in Grafana(localhost:9000/#/query) and Enjoy!
+Then open the [Pinot] SQL Console(localhost:9000/#/query) and Enjoy!
 
 
 ![](img/pinot-profillig.png)
