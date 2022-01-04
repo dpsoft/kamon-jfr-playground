@@ -1,0 +1,32 @@
+{
+  "schemaName": "jfr-object-allocation-sample",
+  "dimensionFieldSpecs": [
+    {
+      "name": "className",
+      "dataType": "STRING"
+    },
+    {
+      "name": "threadName",
+      "dataType": "STRING"
+    },
+    {
+      "name": "stackTrace",
+      "dataType": "STRING",
+      "singleValueField": false
+    }
+  ],
+  "metricFieldSpecs": [
+    {
+      "name": "weight",
+      "dataType": "LONG"
+    }
+  ],
+  "dateTimeFieldSpecs": [
+    {
+      "name": "startTime",
+      "dataType": "LONG",
+      "format": "1:MILLISECONDS:EPOCH",
+      "granularity": "1:MILLISECONDS"
+    }
+  ]
+}

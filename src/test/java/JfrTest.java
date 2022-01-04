@@ -24,7 +24,6 @@ public class JfrTest {
 
         System.out.println(jfrEvents.events().collect(Collectors.toList()));
         assertThat(jfrEvents).contains(event("jdk.GarbageCollection"));
-        assertThat(jfrEvents).contains(
-                event("jdk.ThreadSleep").with("time", Duration.ofSeconds(1)));
+        assertThat(jfrEvents).contains(event("jdk.ThreadSleep").with("time", Duration.ofSeconds(1)));
     }
 }

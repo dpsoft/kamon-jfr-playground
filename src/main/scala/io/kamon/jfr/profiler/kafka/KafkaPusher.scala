@@ -1,13 +1,19 @@
 package io.kamon.jfr.profiler.kafka
 
+import ch.qos.logback.classic.Logger
 import io.kamon.jfr.profiler.Profiler.Sample
 import io.kamon.jfr.profiler.serde.Jackson
-import org.apache.kafka.clients.producer.{KafkaProducer, ProducerRecord}
+import org.apache.kafka.clients.producer.{Callback, KafkaProducer, ProducerRecord, RecordMetadata}
+import org.slf4j.LoggerFactory
 
 import java.net.InetAddress
 import java.util.Properties
+import scala.util.Try
 
 object KafkaPusher:
+
+  private val log = LoggerFactory.getLogger(KafkaPusher.getClass)
+
   private val properties = Properties()
   properties.put("client.id", InetAddress.getLocalHost.getHostName)
   properties.put("bootstrap.servers", "localhost:19092")
@@ -18,5 +24,10 @@ object KafkaPusher:
   private val producer = KafkaProducer[String, String](properties);
   sys.addShutdownHook(producer.close())
 
-  def push(value: Sample): Unit =
-    producer.send(new ProducerRecord[String, String]("jfr-allocation-topic", Jackson.toJson(value))).get()
+  def push(value: Sample): Unit = {
+    val record = new ProducerRecord[String, String]("jfr-allocation-topic", Jackson.toJson(value))
+    
+    producer.send(record, (metadata: RecordMetadata, exception: Exception) => {
+      if (exception != null) log.error("Send failed for record" + record, exception)
+    })
+  }

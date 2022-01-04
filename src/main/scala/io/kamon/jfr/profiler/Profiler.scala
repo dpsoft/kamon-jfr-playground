@@ -12,7 +12,7 @@ import scala.jdk.CollectionConverters.*
 
 object Profiler {
   case class Sample(startTime: Long,
-                    clazz: String,
+                    className: String,
                     weight: Long,
                     threadName: String,
                     stackTrace: List[String])
