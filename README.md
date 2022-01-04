@@ -1,7 +1,7 @@
 # JFR playground
 
 A proof of concept of how to collect metrics using the JDK Flight Recorder 
-event streaming([JEP 349]) and [Kamon] to send them to Prometheus + Grafana.
+event streaming([JEP 349]) and [Kamon] to send them to Prometheus/Pinot.
 
 ## Prerequisites
 * Java 17+
