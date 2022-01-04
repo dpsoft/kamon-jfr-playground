@@ -17,7 +17,6 @@ final class JfrConsumer(settings: JMap[String, String]) extends Thread {
     while (doRun) {
       Using.resource(RecordingStream()) { rs =>
         rs.setSettings(settings)
-        //          rs.onMetadata(metadata => onMetadata(metadata))
         rs.onEvent(e => onEvent(e))
         rs.start()
       }
@@ -41,12 +40,4 @@ final class JfrConsumer(settings: JMap[String, String]) extends Thread {
       case "jdk.ObjectAllocationSample" => Profiler.onAllocationSample(event)
       case other => println(event)
     }
-
-
-  private def onMetadata(metadata: MetadataEvent): Unit =
-    metadata
-      .getEventTypes
-      .asScala
-      .filterNot(_.isEnabled)
-      .foreach(x => println(x.getName))
 }
