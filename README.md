@@ -55,25 +55,7 @@ curl -X POST "http://localhost:9000/tables" -H "accept: application/json" -H "Co
 ```
 Then open the [Pinot] `SQL Console(localhost:9000/#/query)` and Enjoy!
 
-
-![](img/pinot-profillig.png)
-
-![](img/pinot-profilling-2.png)
-
-Also, we can use a `curl` with a little of `jq` 
-
-```shell
-curl 'http://localhost:9000/sql' \ 
---data-raw $'{
-  "sql":"select weight, className as class_name, threadName as thread, stackTrace as stack_trace 
-         from 'jfr-object-allocation' 
-         where class_name <> 'null' 
-         order by weight 
-         desc limit 100", 
-   "trace":false
-}' | jq '.[] | {rows}'
-```
-![](img/jq.png)
+![](img/pinot.png)
 
 ## Disclaimer
 I have just scratched the surface of [Pinot] capabilities, and I'm sure there are other better ways of modeling than the one proposed, 

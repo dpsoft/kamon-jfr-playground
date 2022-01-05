@@ -11,11 +11,17 @@ import java.lang.reflect.Modifier
 import scala.jdk.CollectionConverters.*
 
 object Profiler {
+
+  case class Frame(classLoader: String,
+                   lineNumber: String,
+                   `type`: String,
+                   method: String)
+
   case class Sample(startTime: Long,
                     className: String,
                     weight: Long,
                     threadName: String,
-                    stackTrace: List[String])
+                    stackTrace: List[Frame])
 
   def onAllocationSample(event: RecordedEvent): Unit = {
     val startTime = event.getLong("startTime")
@@ -36,11 +42,18 @@ object Profiler {
       .foreach(KafkaPusher.push)
   }
 
-  private def parseFrame(rf: RecordedFrame): Option[String] =
+  private def parseFrame(rf: RecordedFrame): Option[Frame] =
     val method = rf.getMethod
     val methodDescriptor = s"${method.getType.getName}.${method.getName}${method.getDescriptor}"
 
     MethodSignatureParser
       .methodSignature(methodDescriptor)
-      .map(methodSignature => s"$methodSignature:${rf.getLineNumber}")
+      .map(methodSignature => {
+        val classLoader = rf.getMethod.getType.getClassLoader.getName
+        val lineNumber = rf.getLineNumber.toString
+        val tpe = rf.getType
+        val method =  s"$methodSignature:${rf.getLineNumber}"
+
+        Frame(classLoader, lineNumber, tpe, method)
+      })
 }

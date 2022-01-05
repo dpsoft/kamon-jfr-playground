@@ -10,7 +10,22 @@
       "dataType": "STRING"
     },
     {
-      "name": "stackTrace",
+      "name": "stack_trace_json",
+      "dataType": "STRING",
+      "maxLength": 2147483647
+    },
+    {
+      "name": "frame_type",
+      "dataType": "STRING",
+      "singleValueField": false
+    },
+    {
+      "name": "method",
+      "dataType": "STRING",
+      "singleValueField": false
+    },
+    {
+      "name": "class_loader",
       "dataType": "STRING",
       "singleValueField": false
     }

@@ -25,7 +25,8 @@
     "sortedColumn": [],
     "bloomFilterColumns": [],
     "bloomFilterConfigs": null,
-    "noDictionaryColumns": [],
+    "noDictionaryColumns": ["stack_trace_json"],
+    "jsonIndexColumns": ["stack_trace_json"],
     "onHeapDictionaryColumns": [],
     "varLengthDictionaryColumns": [],
     "enableDefaultStarTree": false,
@@ -51,7 +52,24 @@
   "metadata": {},
   "ingestionConfig": {
     "filterConfig": null,
-    "transformConfigs": null
+    "transformConfigs": [
+      {
+        "columnName": "stack_trace_json",
+        "transformFunction": "jsonFormat(stackTrace)"
+      },
+      {
+        "columnName": "frame_type",
+        "transformFunction": "jsonPathArray(stackTrace, '$.[*].type')"
+      },
+      {
+        "columnName": "method",
+        "transformFunction": "jsonPathArray(stackTrace, '$.[*].method')"
+      },
+      {
+        "columnName": "class_loader",
+        "transformFunction": "jsonPathArray(stackTrace, '$.[*].classLoader')"
+      }
+    ]
   },
   "quota": {
     "storage": null,
