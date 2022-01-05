@@ -52,7 +52,7 @@ object Profiler {
         val classLoader = rf.getMethod.getType.getClassLoader.getName
         val lineNumber = rf.getLineNumber.toString
         val tpe = rf.getType
-        val method =  s"$methodSignature:${rf.getLineNumber}"
+        val method =  s"$methodSignature"
 
         Frame(classLoader, lineNumber, tpe, method)
       })
