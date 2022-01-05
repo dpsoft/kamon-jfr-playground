@@ -5,12 +5,16 @@ import io.kamon.jfr.metrics.jvm.{ClassLoading, GarbageCollection, Safepoint, Thr
 import io.kamon.jfr.metrics.os.{Cpu, Memory, Network}
 import io.kamon.jfr.profiler.Profiler
 import jdk.jfr.consumer.{MetadataEvent, RecordedEvent, RecordingStream}
-import scala.jdk.CollectionConverters.*
+import org.slf4j.LoggerFactory
 
+import scala.jdk.CollectionConverters.*
 import java.util.Map as JMap
 import scala.util.Using
 
 final class JfrConsumer(settings: JMap[String, String]) extends Thread {
+
+  private val log = LoggerFactory.getLogger(classOf[JfrConsumer])
+
   @volatile private var doRun = true
 
   override def run(): Unit =
@@ -38,6 +42,6 @@ final class JfrConsumer(settings: JMap[String, String]) extends Thread {
       case "jdk.ContainerMemoryUsage" => ContainerMemory.onContainerMemory(event)
       case "jdk.ContainerCPUUsage" => ContainerCpu.onContainerCPULoad(event)
       case "jdk.ObjectAllocationSample" => Profiler.onAllocationSample(event)
-      case other => println(event)
+      case other => log.info(s"Event not registered: $event")
     }
 }
